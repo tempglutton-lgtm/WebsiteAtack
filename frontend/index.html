@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebsiteAttack</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="banner">
+        <div class="banner-title">🕷 WEBSITEATTACK</div>
+        <div class="banner-subtitle">Automated Web Security Testing</div>
+      </div>
+
+      <form id="scan-form" class="scan-form">
+        <label class="label">Target URL</label>
+        <input id="target-url" class="input" type="url" placeholder="https://authorized-target.example" required />
+
+        <label class="label">Mode</label>
+        <select id="mode" class="input">
+          <option>Authorized Security Testing</option>
+        </select>
+
+        <div class="confirm-row">
+          <label>
+            <input id="agree-checkbox" type="checkbox" /> I confirm that I am authorized to test this target.
+          </label>
+        </div>
+
+        <button id="start-button" class="primary-button" type="submit">START SCAN</button>
+        <div class="warning">⚠ Only scan systems you own or are explicitly authorized to test.</div>
+      </form>
+
+      <section id="status-panel" class="status-panel hidden">
+        <h2>Scan Progress</h2>
+        <div class="status-item"><strong>TARGET</strong><span id="status-target"></span></div>
+        <div class="status-item"><strong>MODULE</strong><span id="status-module"></span></div>
+        <div class="progress-bar-row">
+          <label>Reconnaissance</label>
+          <div class="progress-bar"><div id="progress-reconnaissance" class="progress-fill"></div></div>
+        </div>
+        <div class="progress-bar-row">
+          <label>Crawling</label>
+          <div class="progress-bar"><div id="progress-crawling" class="progress-fill"></div></div>
+        </div>
+        <div class="progress-bar-row">
+          <label>Endpoint Analysis</label>
+          <div class="progress-bar"><div id="progress-endpoints" class="progress-fill"></div></div>
+        </div>
+        <div class="progress-bar-row">
+          <label>Security Testing</label>
+          <div class="progress-bar"><div id="progress-testing" class="progress-fill"></div></div>
+        </div>
+        <div class="status-summary">
+          <div>Current URL: <span id="status-current-url"></span></div>
+          <div>Requests: <span id="status-requests">0</span></div>
+          <div>Endpoints discovered: <span id="status-endpoints">0</span></div>
+        </div>
+        <button id="cancel-button" class="secondary-button">CANCEL SCAN</button>
+      </section>
+
+      <section id="results-panel" class="status-panel hidden">
+        <div class="results-header">
+          <h2>Scan Results</h2>
+          <span id="results-state" class="results-state">Complete</span>
+        </div>
+        <div id="results-summary" class="results-summary"></div>
+        <div id="findings-list" class="findings-list"></div>
+      </section>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
