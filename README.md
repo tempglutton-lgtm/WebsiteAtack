@@ -65,6 +65,10 @@ pip install -r requirements.txt
 
 5. Start the scan and monitor progress in the UI.
 
+### Normal setup
+
+1. I only did the arch setup thingie cuz i main arch soo, anyways its basically the samething on windows and other distros.
+
 ### Notes
 
 - Only scan systems you are authorized to test.
