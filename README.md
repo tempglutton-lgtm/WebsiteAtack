@@ -80,7 +80,7 @@ pip install -r requirements.txt
 - `backend/` - FastAPI server, crawler, scanner modules, reporting, and database models.
 - `frontend/` - Web UI assets.
 
-## Phase 1
+## Launch Version Beta
 
 This version includes:
 
@@ -89,3 +89,5 @@ This version includes:
 - asynchronous crawler
 - progress tracking API
 - modern dark UI shell
+
+# More updates soon!
