@@ -12,7 +12,7 @@ class SensitiveRouteScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return True
 
-    async def run(self, endpoint: Any) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         path = endpoint.get("url", "").lower()
         hints = ["admin", "login", "logout", "signup", "register", "reset", "management", "dashboard", "account"]

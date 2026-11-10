@@ -41,7 +41,7 @@ def generate_findings(endpoints):
                 "parameter": ", ".join([k for k in query_keys if k.lower() in ["url", "next", "return", "redirect"]]) or "N/A",
                 "evidence": "This endpoint includes redirect-related behavior or common redirect parameter names.",
                 "explanation": "Redirect parameters can be abused if the application does not validate destination domains.",
-                "verification_guidance": "Submit a safe external URL and observe whether the application redirects without validation.",
+                "verification_guidance": "Only in authorized staging, use a destination controlled by the assessor and inspect the response Location header without following it. Never send users to or follow a third-party destination; a redirect parameter alone is not confirmation.",
                 "impact": "Open redirects can facilitate phishing and credential theft in authorized security contexts.",
                 "remediation": "Restrict redirect targets to allowed locations and validate all redirect input values.",
             })

@@ -12,7 +12,7 @@ class ServerHeaderScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return bool(endpoint.get("headers"))
 
-    async def run(self, endpoint: Any) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         server_header = endpoint.get("headers", {}).get("server")
         if server_header:

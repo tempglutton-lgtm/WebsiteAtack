@@ -28,7 +28,7 @@ class TechnologyFingerprintingScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return bool(endpoint.get("headers")) or bool(endpoint.get("body"))
 
-    def run(self, endpoint: Any, session=None) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         body = str(endpoint.get("body", "")).lower()
         headers = {k.lower(): str(v).lower() for k, v in endpoint.get("headers", {}).items()}

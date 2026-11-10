@@ -1,7 +1,19 @@
 from typing import Any, List
+from urllib.parse import urlsplit
 
 from backend.scanners.base import Scanner
-from backend.scanners.utils import url_contains_words
+
+
+SENSITIVE_PATH_SEGMENTS = {
+    "account",
+    "admin",
+    "checkout",
+    "login",
+    "logout",
+    "password",
+    "profile",
+    "session",
+}
 
 
 class CacheControlScanner(Scanner):
@@ -16,17 +28,33 @@ class CacheControlScanner(Scanner):
 
     async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
-        headers = {k.lower(): v for k, v in endpoint.get("headers", {}).items()}
+        headers = {
+            str(key).lower(): str(value)
+            for key, value in endpoint.get("headers", {}).items()
+        }
         url = endpoint.get("url", "")
         cache = headers.get("cache-control", "")
         evidence = []
+        path_segments = {
+            segment.lower()
+            for segment in urlsplit(url).path.split("/")
+            if segment
+        }
+        looks_sensitive = bool(path_segments & SENSITIVE_PATH_SEGMENTS)
+        directives = {
+            part.strip().split("=", 1)[0].strip().lower()
+            for part in cache.split(",")
+            if part.strip()
+        }
 
-        if not cache and any(url_contains_words(url, ["login", "logout", "password", "admin", "account", "api"])):
-            evidence.append("Sensitive endpoint does not specify a cache-control policy.")
-        if cache and "no-store" not in cache.lower() and any(url_contains_words(url, ["login", "logout", "password", "admin", "account"])):
-            evidence.append(f"Sensitive endpoint cache-control may not prevent storage: {cache}")
-        if cache and "max-age" in cache.lower() and "no-store" not in cache.lower() and "private" not in cache.lower():
-            evidence.append(f"Cache-control may allow public caching: {cache}")
+        if looks_sensitive and not cache:
+            evidence.append(
+                "Path name suggests potentially sensitive content, but no Cache-Control policy was observed."
+            )
+        elif looks_sensitive and not directives & {"no-store", "private"}:
+            evidence.append(
+                f"Potentially sensitive path has no no-store/private directive: {cache}"
+            )
 
         if not evidence:
             return []
@@ -34,7 +62,7 @@ class CacheControlScanner(Scanner):
         self._findings.append({
             "id": f"cache-control-{url}",
             "category": "Configuration",
-            "title": "Cache-control configuration issue",
+            "title": "Cache policy review recommended",
             "severity": "Low",
             "confidence": 55,
             "status": "Needs Manual Verification",

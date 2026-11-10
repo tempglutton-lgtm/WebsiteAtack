@@ -182,7 +182,7 @@ class OpenRedirectScanner(Scanner):
             "parameter": ", ".join(params),
             "evidence": "The endpoint includes common redirect-related parameters.",
             "explanation": "Open redirects can be abused to redirect users to malicious URLs.",
-            "verification_guidance": "Send a safe external destination and verify whether the application redirects without validation.",
+            "verification_guidance": "Only in authorized staging, use a destination controlled by the assessor and inspect the response Location header without following it. Never send users to or follow a third-party destination; a redirect parameter alone is not confirmation.",
             "impact": "Open redirects can enable phishing and token theft.",
             "remediation": "Validate redirect destinations or use allowlisted URLs only.",
         })

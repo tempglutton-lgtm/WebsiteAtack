@@ -5,6 +5,8 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import aiohttp
 
+from backend.http_limits import read_response_body
+
 PROBE_TIMEOUT_SECONDS = 10
 
 COMMON_SENSITIVE_FIELDS = ["password", "token", "secret", "api_key", "credit_card", "ssn", "social_security"]
@@ -120,13 +122,10 @@ def find_fragment(body: str, value: str) -> bool:
 
 
 async def fetch_url(session: aiohttp.ClientSession, url: str) -> Tuple[int, Dict[str, str], str]:
-    try:
-        async with session.get(url, timeout=PROBE_TIMEOUT_SECONDS, allow_redirects=False) as response:
-            body = await response.text(errors="ignore")
-            headers = {k.lower(): v for k, v in response.headers.items()}
-            return response.status, headers, body
-    except Exception:
-        return 0, {}, ""
+    async with session.get(url, timeout=PROBE_TIMEOUT_SECONDS, allow_redirects=False) as response:
+        headers = {k.lower(): v for k, v in response.headers.items()}
+        text = await read_response_body(response)
+        return response.status, headers, text
 
 
 async def probe_parameter(session: aiohttp.ClientSession, endpoint: Dict[str, Any], payload: str, param: Optional[str] = None) -> Tuple[int, Dict[str, str], str]:
@@ -156,6 +155,25 @@ def url_contains_words(url: str, words: List[str]) -> bool:
 
 def header_missing(endpoint: Dict[str, Any], header_name: str) -> bool:
     return header_name.lower() not in endpoint.get("headers", {})
+
+
+def has_restrictive_frame_ancestors(headers: Dict[str, Any]) -> bool:
+    csp = next(
+        (
+            str(value)
+            for name, value in headers.items()
+            if str(name).lower() == "content-security-policy"
+        ),
+        "",
+    )
+    for policy in csp.split(","):
+        for directive in policy.split(";"):
+            parts = directive.strip().lower().split()
+            if parts and parts[0] == "frame-ancestors":
+                sources = set(parts[1:])
+                if sources in ({"'none'"}, {"'self'"}):
+                    return True
+    return False
 
 
 def response_has_redirect(headers: Dict[str, str], location_substring: str) -> bool:

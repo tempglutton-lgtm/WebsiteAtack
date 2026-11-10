@@ -13,7 +13,7 @@ class EndpointDiscoveryScanner(Scanner):
 
     def applicable(self, endpoint: Any) -> bool:
         path = endpoint.get("url", "").lower()
-        return any(url_contains_words(path, ["admin", "dashboard", "login", "logout", "api", "graphql", "config", "backup", "secret", "wp-", ".git", ".env"]))
+        return url_contains_words(path, ["admin", "dashboard", "login", "logout", "api", "graphql", "config", "backup", "secret", "wp-", ".git", ".env"])
 
     async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
