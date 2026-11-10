@@ -12,7 +12,7 @@ class RobotsSitemapScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return endpoint.get("url", "").lower().endswith("/robots.txt") or endpoint.get("url", "").lower().endswith("/sitemap.xml")
 
-    async def run(self, endpoint: Any) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         self._findings.append({
             "id": f"robots-sitemap-{endpoint['url']}",

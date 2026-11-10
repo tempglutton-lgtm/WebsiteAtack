@@ -1,6 +1,7 @@
 from typing import Any, List
 
 from backend.scanners.base import Scanner
+from backend.scanners.utils import has_restrictive_frame_ancestors
 
 class ClickjackingScanner(Scanner):
     name = "Clickjacking"
@@ -14,12 +15,21 @@ class ClickjackingScanner(Scanner):
 
     async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
-        headers = endpoint.get("headers", {})
+        if "text/html" not in str(
+            endpoint.get("content_type", "")
+        ).lower() and "text/html" not in str(
+            endpoint.get("headers", {}).get("content-type", "")
+        ).lower():
+            return self._findings
+        headers = {
+            str(key).lower(): str(value)
+            for key, value in endpoint.get("headers", {}).items()
+        }
         x_frame_options = headers.get("x-frame-options", "")
-        csp = headers.get("content-security-policy", "")
-        csp_has_frame_ancestors = "frame-ancestors" in csp.lower()
+        csp_has_frame_ancestors = has_restrictive_frame_ancestors(headers)
+        x_frame_protected = x_frame_options.strip().lower() in {"deny", "sameorigin"}
 
-        if not x_frame_options and not csp_has_frame_ancestors:
+        if not x_frame_protected and not csp_has_frame_ancestors:
             self._findings.append({
                 "id": f"clickjacking-{endpoint['url']}",
                 "category": "Client-side",

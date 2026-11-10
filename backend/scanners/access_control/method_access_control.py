@@ -13,7 +13,7 @@ class MethodAccessControlScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return True
 
-    async def run(self, endpoint: Any) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         path = urlparse(endpoint.get("url", "")).path.lower()
         if any(keyword in path for keyword in ["delete", "update", "remove", "admin", "config"]):

@@ -12,27 +12,30 @@ class CorsScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return bool(endpoint.get("headers"))
 
-    async def run(self, endpoint: Any) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         headers = endpoint.get("headers", {})
         origin = headers.get("access-control-allow-origin", "")
         credentials = headers.get("access-control-allow-credentials", "")
-        if origin == "*" or "http://" in origin or "https://" in origin:
+        if origin.strip() == "*":
             self._findings.append({
                 "id": f"cors-{endpoint['url']}",
                 "category": "Configuration",
-                "title": "Permissive CORS policy",
-                "severity": "Low",
-                "confidence": 60,
-                "status": "Potential",
+                "title": "CORS wildcard policy observed",
+                "severity": "Informational",
+                "confidence": 100,
+                "status": "Informational",
                 "url": endpoint["url"],
                 "method": endpoint.get("method", "GET"),
                 "parameter": "",
-                "evidence": f"CORS header exposed: Access-Control-Allow-Origin: {origin}",
-                "explanation": "A permissive CORS configuration can allow untrusted origins to access responses in a browser.",
-                "verification_guidance": "Inspect response headers and verify whether the site allows too many origins or unsafe credentials behavior.",
-                "impact": "Permissive CORS may expose sensitive data to attacker-controlled web pages.",
-                "remediation": "Restrict allowed origins and avoid unsafe wildcard settings unless necessary.",
+                "evidence": (
+                    "Access-Control-Allow-Origin is '*'; this alone does not establish "
+                    "a vulnerability or permit credentialed cross-origin reads."
+                ),
+                "explanation": "A wildcard origin may be intentional for public resources and is not proof of sensitive data exposure.",
+                "verification_guidance": "Manually test the exact endpoint and data classification in an authorized browser context; assess credentials and origin behavior.",
+                "impact": "No impact is confirmed by this header alone.",
+                "remediation": "No change is required solely because a public endpoint uses a wildcard; restrict origins only when the resource requires it.",
             })
         return self._findings
 

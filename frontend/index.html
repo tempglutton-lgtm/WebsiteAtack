@@ -1,76 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WebsiteAttack</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <meta name="theme-color" content="#050505" />
+  <meta name="description" content="Consola local de avaliação de segurança web autorizada." />
+  <title>WebsiteAttack | Consola de segurança</title>
+  <link rel="stylesheet" href="/styles.css?v=0.3.2" />
 </head>
 <body>
-  <main class="container">
-    <section class="hero">
-      <div class="banner">
-        <div class="banner-title">🕷 WEBSITEATTACK</div>
-        <div class="banner-subtitle">Automated Web Security Testing</div>
-      </div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="WebsiteAttack, início">
+        <span class="brand-mark" aria-hidden="true">W</span>
+        <span class="brand-copy">
+          <strong>WEBSITE<span>ATTACK</span></strong>
+          <small>CONSOLA DE AVALIAÇÃO WEB</small>
+        </span>
+      </a>
+      <div class="topbar-status"><span class="online-dot"></span> LOCAL · NESTE DISPOSITIVO</div>
+    </header>
 
-      <form id="scan-form" class="scan-form">
-        <label class="label">Target URL</label>
-        <input id="target-url" class="input" type="url" placeholder="https://authorized-target.example" required />
+    <main class="workspace">
+      <aside class="setup-column">
+        <form id="scan-form" class="setup-card">
+          <div class="section-kicker">NOVA AVALIAÇÃO</div>
+          <h1>Configurar análise</h1>
+          <p class="muted-copy">Informe o URL e confirme que tem autorização expressa para este endereço. A análise passiva usa limites de segurança predefinidos.</p>
 
-        <label class="label">Mode</label>
-        <select id="mode" class="input">
-          <option>Authorized Security Testing</option>
-        </select>
+          <div class="field">
+            <label class="label" for="target-url">URL do alvo <span class="required-mark">*</span></label>
+            <input id="target-url" class="input" type="url" placeholder="https://exemplo.pt" autocomplete="url" required />
+            <span class="field-hint">O rastreio fica limitado ao âmbito configurado.</span>
+          </div>
 
-        <div class="confirm-row">
-          <label>
-            <input id="agree-checkbox" type="checkbox" /> I confirm that I am authorized to test this target.
+          <div class="scan-profile">
+            <span class="profile-mark" aria-hidden="true">◈</span>
+            <span><strong>Análise passiva</strong><small>Configuração automática com limites de segurança</small></span>
+            <span class="profile-lock" aria-label="Configuração automática">AUTO</span>
+          </div>
+
+          <label class="check-row authorization-check">
+            <input id="agree-checkbox" type="checkbox" />
+            <span>Confirmo que tenho autorização expressa do proprietário ou responsável para avaliar este URL.</span>
           </label>
-        </div>
+          <button id="start-button" class="primary-button" type="submit">
+            <span aria-hidden="true">▶</span> INICIAR ANÁLISE
+          </button>
+          <p class="safety-note"><span aria-hidden="true">!</span> A confirmação é uma declaração sua; a ferramenta não verifica a autorização. Apenas análise passiva, sem login ou testes ativos.</p>
+        </form>
 
-        <button id="start-button" class="primary-button" type="submit">START SCAN</button>
-        <div class="warning">⚠ Only scan systems you own or are explicitly authorized to test.</div>
-      </form>
+        <div class="side-note">
+          <span class="side-note-icon" aria-hidden="true">◈</span>
+          <p><strong>Registo local</strong><br />O log operacional não inclui credenciais e tem retenção de 90 dias. Proteja os relatórios e a pasta do log.</p>
+        </div>
+      </aside>
 
-      <section id="status-panel" class="status-panel hidden">
-        <h2>Scan Progress</h2>
-        <div class="status-item"><strong>TARGET</strong><span id="status-target"></span></div>
-        <div class="status-item"><strong>MODULE</strong><span id="status-module"></span></div>
-        <div class="progress-bar-row">
-          <label>Reconnaissance</label>
-          <div class="progress-bar"><div id="progress-reconnaissance" class="progress-fill"></div></div>
-        </div>
-        <div class="progress-bar-row">
-          <label>Crawling</label>
-          <div class="progress-bar"><div id="progress-crawling" class="progress-fill"></div></div>
-        </div>
-        <div class="progress-bar-row">
-          <label>Endpoint Analysis</label>
-          <div class="progress-bar"><div id="progress-endpoints" class="progress-fill"></div></div>
-        </div>
-        <div class="progress-bar-row">
-          <label>Security Testing</label>
-          <div class="progress-bar"><div id="progress-testing" class="progress-fill"></div></div>
-        </div>
-        <div class="status-summary">
-          <div>Current URL: <span id="status-current-url"></span></div>
-          <div>Requests: <span id="status-requests">0</span></div>
-          <div>Endpoints discovered: <span id="status-endpoints">0</span></div>
-        </div>
-        <button id="cancel-button" class="secondary-button">CANCEL SCAN</button>
+      <section class="main-column" aria-label="Estado e resultados da avaliação">
+        <section id="status-panel" class="dashboard-card status-panel hidden" aria-live="polite">
+          <div class="panel-heading">
+            <div>
+              <div class="section-kicker">EXECUÇÃO</div>
+              <h2>Progresso da análise</h2>
+            </div>
+            <span id="results-state" class="results-state"><span class="online-dot"></span> A aguardar</span>
+          </div>
+
+          <div class="target-strip">
+            <span class="target-icon" aria-hidden="true">◎</span>
+            <div><small>ALVO EM AVALIAÇÃO</small><strong id="status-target">—</strong></div>
+            <div class="module-indicator"><small>FASE ATUAL</small><strong id="status-module">a iniciar</strong></div>
+          </div>
+
+          <div class="progress-grid">
+            <div class="progress-step">
+              <div class="progress-label"><span>Reconhecimento</span><span class="step-index">01</span></div>
+              <div class="progress-bar"><div id="progress-reconnaissance" class="progress-fill"></div></div>
+            </div>
+            <div class="progress-step">
+              <div class="progress-label"><span>Rastreamento</span><span class="step-index">02</span></div>
+              <div class="progress-bar"><div id="progress-crawling" class="progress-fill"></div></div>
+            </div>
+            <div class="progress-step">
+              <div class="progress-label"><span>Endpoints</span><span class="step-index">03</span></div>
+              <div class="progress-bar"><div id="progress-endpoints" class="progress-fill"></div></div>
+            </div>
+            <div class="progress-step">
+              <div class="progress-label"><span>Verificações selecionadas</span><span class="step-index">04</span></div>
+              <div class="progress-bar"><div id="progress-testing" class="progress-fill"></div></div>
+            </div>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric"><span>PEDIDOS</span><strong id="status-requests">0</strong></div>
+            <div class="metric"><span>ENDPOINTS</span><strong id="status-endpoints">0</strong></div>
+            <div class="metric"><span>VERIFICAÇÕES</span><strong id="status-tests">0 / 0</strong></div>
+            <div class="metric metric-warning"><span>FALHAS / AVISOS</span><strong id="status-errors">0</strong></div>
+          </div>
+          <div class="current-request"><span class="online-dot"></span><span class="current-request-label">PEDIDO ATUAL</span><span id="status-current-url">À espera da execução</span></div>
+          <button id="cancel-button" class="secondary-button" type="button" disabled>PARAR ANÁLISE</button>
+        </section>
+
+        <section id="results-panel" class="dashboard-card results-panel hidden">
+          <div class="panel-heading results-heading">
+            <div>
+              <div class="section-kicker">RELATÓRIO</div>
+              <h2>Resultados e ocorrências</h2>
+            </div>
+            <div class="results-actions">
+              <button id="export-json" class="export-button" type="button">JSON</button>
+              <button id="export-csv" class="export-button" type="button">CSV</button>
+              <button id="export-pdf" class="export-button export-primary" type="button">PDF ↗</button>
+            </div>
+          </div>
+          <div id="results-summary" class="results-summary"></div>
+          <div id="scan-errors" class="scan-errors hidden" role="status"></div>
+
+          <div class="results-toolbar">
+            <div class="findings-title">
+              <h3>Indicadores detetados</h3>
+              <span id="findings-count" class="findings-count">0</span>
+              <span class="manual-review-tag">NÃO CONFIRMADOS · REVISÃO MANUAL</span>
+            </div>
+            <div class="filter-controls">
+              <label class="visually-hidden" for="finding-search">Pesquisar ocorrências</label>
+              <input id="finding-search" class="filter-input" type="search" placeholder="Pesquisar ocorrências..." />
+              <label class="visually-hidden" for="severity-filter">Filtrar por severidade</label>
+              <select id="severity-filter" class="filter-select">
+                <option value="all">Todas as severidades</option>
+                <option value="high">Alta</option>
+                <option value="medium">Média</option>
+                <option value="low">Baixa</option>
+                <option value="informational">Informacional</option>
+              </select>
+            </div>
+          </div>
+          <div id="findings-list" class="findings-list"></div>
+          <p class="report-disclaimer">Os resultados automáticos são indicadores heurísticos, não vulnerabilidades confirmadas. As ferramentas e roteiros sugeridos ajudam na inspeção, mas não confirmam sozinhos um achado; a orientação é genérica por categoria. A confirmação requer reprodução segura e validação independente. A ausência de indicadores também não prova segurança.</p>
+        </section>
+
+        <section class="empty-state" id="empty-state">
+          <div class="empty-mark" aria-hidden="true">W<span>.</span></div>
+          <div class="section-kicker">PRONTO PARA INICIAR</div>
+          <h2>A sua avaliação começa aqui.</h2>
+          <p>Configure o alvo autorizado no painel e inicie uma análise para acompanhar a atividade e rever os resultados.</p>
+          <div class="empty-capabilities">
+            <div><span>01</span><strong>Âmbito controlado</strong><small>Rastreio limitado ao alvo autorizado</small></div>
+            <div><span>02</span><strong>Relatórios exportáveis</strong><small>JSON, CSV e PDF com metadados</small></div>
+            <div><span>03</span><strong>Triagem transparente</strong><small>Indicadores apresentados para revisão</small></div>
+          </div>
+        </section>
       </section>
-
-      <section id="results-panel" class="status-panel hidden">
-        <div class="results-header">
-          <h2>Scan Results</h2>
-          <span id="results-state" class="results-state">Complete</span>
-        </div>
-        <div id="results-summary" class="results-summary"></div>
-        <div id="findings-list" class="findings-list"></div>
-      </section>
-    </section>
-  </main>
-  <script src="/app.js"></script>
+    </main>
+  </div>
+  <script src="/app.js?v=0.3.2"></script>
 </body>
 </html>

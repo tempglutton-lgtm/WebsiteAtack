@@ -12,7 +12,7 @@ class CsrfProtectionScanner(Scanner):
     def applicable(self, endpoint: Any) -> bool:
         return bool(endpoint.get("forms"))
 
-    async def run(self, endpoint: Any) -> List[dict]:
+    async def run(self, endpoint: Any, session=None) -> List[dict]:
         self._findings = []
         forms = endpoint.get("forms", [])
         for index, form in enumerate(forms, start=1):
